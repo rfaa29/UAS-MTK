@@ -12,7 +12,7 @@ Sebuah pabrik memproduksi dua produk:
 - Produk A (`x`) = Kipas Angin
 - Produk B (`y`) = Blender
 
-Tujuan: **Memaksimalkan total keuntungan** dengan batasan waktu dari dua mesin.
+Tujuan: **Memaksimalkan total keuntungan** dengan batasan waktu mesin dan jumlah produksi maksimal.
 """)
 
 # Input
@@ -22,36 +22,50 @@ col1, col2 = st.columns(2)
 with col1:
     profit_A = st.number_input("Keuntungan per unit Produk A (x)", min_value=0.0, value=40.0)
     waktu_mesin1 = st.number_input("Batas waktu Mesin 1 (misal: x + y ≤ ...)", min_value=0.0, value=15.0)
+    jumlah_maks_A = st.number_input("Jumlah maksimum Produk A (x)", min_value=0.0, value=100.0)
+
 with col2:
     profit_B = st.number_input("Keuntungan per unit Produk B (y)", min_value=0.0, value=30.0)
     waktu_mesin2 = st.number_input("Batas waktu Mesin 2 (misal: 2x + y ≤ ...)", min_value=0.0, value=20.0)
+    jumlah_maks_B = st.number_input("Jumlah maksimum Produk B (y)", min_value=0.0, value=100.0)
 
-# Cek input
-if profit_A > 0 and profit_B > 0 and waktu_mesin1 > 0 and waktu_mesin2 > 0:
-    # Model LP
+# Cek validitas input
+if all(v > 0 for v in [profit_A, profit_B, waktu_mesin1, waktu_mesin2, jumlah_maks_A, jumlah_maks_B]):
+    # Fungsi tujuan
     c = [-profit_A, -profit_B]
-    A = [[1, 1], [2, 1]]
-    b = [waktu_mesin1, waktu_mesin2]
 
-    res = linprog(c, A_ub=A, b_ub=b, method='highs')
+    # Batasan
+    A = [
+        [1, 1],     # Mesin 1: x + y ≤ ...
+        [2, 1],     # Mesin 2: 2x + y ≤ ...
+        [1, 0],     # x ≤ jumlah_maks_A
+        [0, 1]      # y ≤ jumlah_maks_B
+    ]
+    b = [waktu_mesin1, waktu_mesin2, jumlah_maks_A, jumlah_maks_B]
+
+    res = linprog(c, A_ub=A, b_ub=b, bounds=(0, None), method='highs')
 
     # Visualisasi
     st.subheader("📊 Visualisasi Area Feasible dan Solusi Optimal")
 
-    x_vals = np.linspace(0, max(waktu_mesin1, waktu_mesin2) + 5, 400)
-    y1 = waktu_mesin1 - x_vals           # x + y ≤ waktu_mesin1
-    y2 = waktu_mesin2 - 2 * x_vals       # 2x + y ≤ waktu_mesin2
+    x_vals = np.linspace(0, max(jumlah_maks_A, waktu_mesin1, waktu_mesin2), 400)
+    y1 = waktu_mesin1 - x_vals
+    y2 = waktu_mesin2 - 2 * x_vals
+    y3 = np.full_like(x_vals, jumlah_maks_B)  # y ≤ jumlah_maks_B
+    y4 = np.maximum(0, np.full_like(x_vals, 0))  # y ≥ 0
 
     fig, ax = plt.subplots()
     ax.plot(x_vals, y1, label=f"x + y ≤ {waktu_mesin1}", color='blue')
     ax.plot(x_vals, y2, label=f"2x + y ≤ {waktu_mesin2}", color='green')
-    ax.axhline(0, color='black', linewidth=0.5)
-    ax.axvline(0, color='black', linewidth=0.5)
+    ax.axhline(jumlah_maks_B, color='purple', linestyle='--', label=f"y ≤ {jumlah_maks_B}")
+    ax.axvline(jumlah_maks_A, color='orange', linestyle='--', label=f"x ≤ {jumlah_maks_A}")
 
-    # Area feasible
-    y_feasible = np.minimum(y1, y2)
+    # Area feasible (approx.)
+    y_feasible = np.minimum(np.minimum(y1, y2), jumlah_maks_B)
     y_feasible = np.maximum(y_feasible, 0)
-    ax.fill_between(x_vals, 0, y_feasible, where=(y_feasible >= 0), color='lightgrey', alpha=0.5, label='Feasible Region')
+    x_limit = x_vals[x_vals <= jumlah_maks_A]
+    y_limit = y_feasible[:len(x_limit)]
+    ax.fill_between(x_limit, 0, y_limit, where=(y_limit >= 0), color='lightgrey', alpha=0.5, label='Feasible Region')
 
     # Solusi optimal
     if res.success:
@@ -67,7 +81,7 @@ if profit_A > 0 and profit_B > 0 and waktu_mesin1 > 0 and waktu_mesin2 > 0:
     ax.legend()
     st.pyplot(fig)
 
-    # Hasil Optimasi
+    # Hasil akhir
     if res.success:
         st.subheader("✅ Hasil Optimasi")
         st.success(f"""
@@ -80,4 +94,4 @@ if profit_A > 0 and profit_B > 0 and waktu_mesin1 > 0 and waktu_mesin2 > 0:
     else:
         st.error("Optimisasi gagal. Solver tidak menemukan solusi yang memenuhi.")
 else:
-    st.warning("⚠️ Harap masukkan semua nilai input dengan benar (lebih dari nol).")
+    st.warning("⚠️ Semua nilai input harus lebih dari 0.")
