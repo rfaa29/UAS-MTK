@@ -85,6 +85,32 @@ if all(v > 0 for v in [profit_A, profit_B, waktu_mesin1, waktu_mesin2, jumlah_ma
     if res.success:
         st.subheader("✅ Hasil Optimasi")
         st.success(f"""
+        
+        st.subheader("📦 Jumlah Produksi Optimal (Bar Chart)")
+        fig2, ax2 = plt.subplots()
+        ax2.bar(["Produk A (Kipas Angin)", "Produk B (Blender)"], [x_opt, y_opt], color=["skyblue", "salmon"])
+        ax2.set_ylabel("Unit")
+        ax2.set_ylim(0, max(jumlah_maks_A, jumlah_maks_B) * 1.2)
+        ax2.set_title("Produksi Optimal per Produk")
+        st.pyplot(fig2)
+
+        # Gantt-like chart pemanfaatan mesin
+        st.subheader("⚙️ Pemanfaatan Mesin (Gantt-like Chart)")
+        pemakaian_mesin1 = x_opt + y_opt
+        pemakaian_mesin2 = 2 * x_opt + y_opt
+
+        fig3, ax3 = plt.subplots()
+        mesin_labels = ["Mesin 1", "Mesin 2"]
+        durasi_pakai = [pemakaian_mesin1, pemakaian_mesin2]
+        kapasitas = [waktu_mesin1, waktu_mesin2]
+
+        ax3.barh(mesin_labels, kapasitas, color="lightgrey", label="Total Kapasitas")
+        ax3.barh(mesin_labels, durasi_pakai, color="steelblue", label="Waktu Terpakai")
+        ax3.set_xlabel("Jam")
+        ax3.set_title("Utilisasi Mesin Produksi")
+        ax3.legend()
+        st.pyplot(fig3)
+
         Kombinasi Produk Optimal:
         - Produk A (x): **{x_opt:.2f} unit**
         - Produk B (y): **{y_opt:.2f} unit**
