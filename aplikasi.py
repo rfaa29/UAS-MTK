@@ -22,7 +22,7 @@ def parse_list(input_str, length):
 profit_input = st.text_input(
     "Masukkan koefisien profit per produk (pisahkan dengan koma)",
     value=",").join(["0"] * n)
-)
+);
 profits = parse_list(profit_input, int(n))
 
 # Input kendala
