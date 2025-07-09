@@ -1,6 +1,3 @@
-# Streamlit App: Optimasi Produksi (Linear Programming)
-# Dibuat menggunakan Streamlit dan PuLP
-
 import streamlit as st
 import pandas as pd
 from pulp import LpMaximize, LpProblem, LpVariable, lpSum, LpStatus, value
@@ -73,39 +70,3 @@ if st.button("Hitung Solusi Optimal"):
 
 st.markdown("---")
 st.markdown("Aplikasi ini menyelesaikan persoalan Linear Programming dengan metode Simpleks dari pustaka PuLP.")
-            st.session_state['steps'] = steps
-            st.session_state['result_expr'] = result_expr
-            st.session_state['plot_expr'] = result_expr if isinstance(result_expr, sp.Expr) else sp.diff(f, x) if operation=="Integral Tentu" else result_expr
-            st.session_state['domain'] = (min_x, max_x)
-
-        except Exception as e:
-            st.error(f"Terjadi kesalahan: {e}")
-
-with col_results:
-    st.subheader("Langkah Perhitungan")
-    if 'steps' in st.session_state:
-        for s in st.session_state['steps']:
-            st.latex(s)
-        st.markdown("---")
-        st.subheader("Hasil Akhir")
-        st.latex(sp.latex(st.session_state['result_expr']))
-
-        # Plot
-        expr_plot = st.session_state['plot_expr']
-        dom = st.session_state['domain']
-        # Lambdify for numeric plot
-        func = sp.lambdify(x, expr_plot, 'numpy')
-        xs = np.linspace(dom[0], dom[1], 400)
-        ys = func(xs)
-        fig, ax = plt.subplots()
-        ax.plot(xs, ys)
-        ax.set_title(f"Plot dari {'derivative' if operation=='Turunan' else 'integral'}")
-        ax.set_xlabel(var)
-        ax.set_ylabel('y')
-        st.pyplot(fig)
-    else:
-        st.write("Klik tombol 'Hitung dan Plot' di samping untuk melihat langkah dan grafik...")
-
-# Footer
-st.markdown("---")
-st.caption("© 2025 Kalkulator Matematika Streamlit")
