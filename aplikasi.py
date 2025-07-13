@@ -12,7 +12,7 @@ Sebuah pabrik memproduksi dua produk:
 - Produk A (`x`) = Blender
 - Produk B (`y`) = Kipas Angin
 
-Tujuan: **Memaksimalkan total keuntungan** dengan batasan waktu mesin dan jumlah produksi maksimal.
+Tujuan: **Memaksimalkan total keuntungan** dengan batasan waktu mesin dan jumlah permintaan pasar.
 """)
 
 # Input
@@ -22,12 +22,12 @@ col1, col2 = st.columns(2)
 with col1:
     profit_A = st.number_input("Keuntungan per unit Produk A (x)", min_value=0.0, value=80.0)
     waktu_mesin1 = st.number_input("Batas waktu Mesin 1 (misal: x + y ≤ ...)", min_value=0.0, value=330.0)
-    jumlah_maks_A = st.number_input("Jumlah maksimum Produk A (x)", min_value=0.0, value=100.0)
+    jumlah_maks_A = st.number_input("Jumlah permintaan Produk A (x)", min_value=0.0, value=100.0)
 
 with col2:
     profit_B = st.number_input("Keuntungan per unit Produk B (y)", min_value=0.0, value=50.0)
     waktu_mesin2 = st.number_input("Batas waktu Mesin 2 (misal: 2x + y ≤ ...)", min_value=0.0, value=440.0)
-    jumlah_maks_B = st.number_input("Jumlah maksimum Produk B (y)", min_value=0.0, value=120.0)
+    jumlah_maks_B = st.number_input("Jumlah permintaan produk B (y)", min_value=0.0, value=120.0)
 
 # Cek validitas input
 if all(v > 0 for v in [profit_A, profit_B, waktu_mesin1, waktu_mesin2, jumlah_maks_A, jumlah_maks_B]):
