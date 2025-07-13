@@ -9,8 +9,8 @@ st.title("📈 Optimasi Produksi (Linear Programming)")
 
 st.markdown("""
 Sebuah pabrik memproduksi dua produk:
-- Produk A (`x`) = Kipas Angin
-- Produk B (`y`) = Blender
+- Produk A (`x`) = Blender
+- Produk B (`y`) = Kipas Angin
 
 Tujuan: **Memaksimalkan total keuntungan** dengan batasan waktu mesin dan jumlah produksi maksimal.
 """)
